@@ -1,0 +1,71 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Tt]est[Rr]esult*/
+artifacts/
+publish/
+
+# .NET tooling
+*.user
+*.userosscache
+*.suo
+*.rsuser
+*.sln.docstates
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# Visual Studio / Rider / VS Code user workspace state
+.vs/
+.idea/
+*.sln.iml
+.vscode/
+
+# ReSharper and dotCover
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+*.dotCover
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.Local.json
+secrets.json
+secrets.*.json
+
+# Local databases and OSINT search data
+data/
+storage/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Diagnostic output
+*.log
+*.pid
+*.stackdump
+
+# OS and temporary files
+[Tt]mp/
+[Tt]emp/
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Generated API clients and protocol buffers, if generated outside obj/
+Generated/
+generated/
