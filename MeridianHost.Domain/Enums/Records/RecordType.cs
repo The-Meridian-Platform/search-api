@@ -1,6 +1,11 @@
 ﻿namespace MeridianHost.Domain.Enums.Records;
 
-public class RecordType
+public enum RecordType
 {
-    
+    A,
+    AAAA,
+    MX,
+    TXT,
+    SRV,
+    CNAME
 }
