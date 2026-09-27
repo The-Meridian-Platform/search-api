@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Abstractions\Repositories\" />
       <Folder Include="Contracts\" />
       <Folder Include="Handlers\" />
       <Folder Include="Mappers\" />
@@ -20,6 +19,10 @@
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
       <PackageReference Include="Scrutor" Version="7.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MeridianHost.Domain\MeridianHost.Domain.csproj" />
     </ItemGroup>
 
 </Project>

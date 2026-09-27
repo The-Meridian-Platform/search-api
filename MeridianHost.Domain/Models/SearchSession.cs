@@ -26,4 +26,31 @@ public sealed class SearchSession
     {
         return Result.Success(new SearchSession(Guid.NewGuid(), target, Status.Pending, DateTimeOffset.UtcNow, null, null));
     }
+
+    public static SearchSession Load(Guid id, SearchTarget target, Status searchStatus, DateTimeOffset createdAt, DateTimeOffset? startedAt, DateTimeOffset? finishedAt)
+        => new SearchSession(id, target, searchStatus, createdAt, startedAt, finishedAt);
+
+    public void Start()
+    {
+        StartedAt = DateTimeOffset.UtcNow;
+        SearchStatus = Status.Running;
+    }
+    
+    public void Cancel()
+    {
+        SearchStatus = Status.Cancelled;
+        FinishedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void Finish()
+    {
+        FinishedAt = DateTimeOffset.UtcNow;
+        SearchStatus = Status.Completed;
+    }
+
+    public void Fail()
+    {
+        SearchStatus = Status.Failed;
+        FinishedAt = DateTimeOffset.UtcNow;
+    }
 }

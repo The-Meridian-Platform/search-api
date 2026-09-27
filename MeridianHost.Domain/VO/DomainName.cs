@@ -44,6 +44,9 @@ public readonly struct DomainName : IEquatable<DomainName>
             records?.ToArray() ?? []));
     }
 
+    public static DomainName Load(string value, IReadOnlyList<DnsRecord>? dnsRecords = null)
+        => new DomainName(value, dnsRecords);
+
     private static Result Validate(string value)
     {
         if (value.Length is < 3 or > 253)

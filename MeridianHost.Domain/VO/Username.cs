@@ -1,4 +1,5 @@
 using CSharpFunctionalExtensions;
+using MeridianHost.Domain.VO.Additional;
 
 namespace MeridianHost.Domain.VO;
 
@@ -21,6 +22,9 @@ public readonly struct Username : IEquatable<Username>
 
         return Result.Success(new Username(normalizedValue));
     }
+
+    public static Username Load(string value)
+        => new Username(value);
 
     private static Result Validate(string value)
     {

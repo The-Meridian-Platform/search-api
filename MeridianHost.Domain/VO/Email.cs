@@ -20,6 +20,9 @@ public readonly struct Email
         return Result.Success(new Email(value));
     }
 
+    public static Email Load(string value)
+        => new Email(value);
+
     private static Result Validate(string value)
     {
         if (value.Length is < 3 or > 128) 

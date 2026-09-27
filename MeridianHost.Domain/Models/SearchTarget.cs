@@ -35,6 +35,9 @@ public sealed class SearchTarget
         };
     }
 
+    public static SearchTarget Load(Guid id, string value, SearchTargetType targetType)
+        => new SearchTarget(id, value, targetType);
+
     internal static SearchTarget CreateValidated(string value, SearchTargetType type) =>
         new(Guid.NewGuid(), value, type);
 

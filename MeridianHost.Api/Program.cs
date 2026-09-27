@@ -9,7 +9,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
-builder.Services.AddPersistence();
+builder.Services.AddPersistence(configuration);
 
 var app = builder.Build();
 
