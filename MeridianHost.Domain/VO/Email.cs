@@ -28,6 +28,9 @@ public readonly struct Email
         if (!value.Contains('@') || (value[0] == '@' || value[value.Length - 1] == '@'))
             return Result.Failure("invalid email address format");
         
+        if (value.Count(c => c == '@') != 1)
+            return Result.Failure("invalid email address");
+        
         return Result.Success();
     }
 

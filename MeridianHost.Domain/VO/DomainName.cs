@@ -7,17 +7,17 @@ namespace MeridianHost.Domain.VO;
 public readonly struct DomainName : IEquatable<DomainName>
 {
     public string Value { get; }
-    public IReadOnlyList<Record> Records { get; }
+    public IReadOnlyList<DnsRecord>? DnsRecords { get; }
 
-    private DomainName(string value, IReadOnlyList<Record> records)
+    private DomainName(string value, IReadOnlyList<DnsRecord>? dnsRecords)
     {
         Value = value;
-        Records = records;
+        DnsRecords = dnsRecords;
     }
 
     public static Result<DomainName> Create(
         string? value,
-        IEnumerable<Record>? records = null)
+        IEnumerable<DnsRecord>? records = null)
     {
         if (string.IsNullOrWhiteSpace(value))
             return Result.Failure<DomainName>("Domain name is required.");
@@ -53,7 +53,7 @@ public readonly struct DomainName : IEquatable<DomainName>
 
         if (labels.Any(label =>
                 label.Length is < 1 or > 63 ||
-                label[0] == '-' ||
+                label[0] == '-' ||  
                 label[^1] == '-' ||
                 label.Any(character => !char.IsAsciiLetterOrDigit(character) && character != '-')))
         {
@@ -62,22 +62,7 @@ public readonly struct DomainName : IEquatable<DomainName>
 
         return Result.Success();
     }
-
-    public bool Equals(DomainName other) =>
-        string.Equals(Value, other.Value, StringComparison.Ordinal);
-
-    public override bool Equals(object? obj) =>
-        obj is DomainName other && Equals(other);
-
-    public override int GetHashCode() =>
-        StringComparer.Ordinal.GetHashCode(Value);
-
-    public override string ToString() => Value;
-
-    public static bool operator ==(DomainName left, DomainName right) => left.Equals(right);
-
-    public static bool operator !=(DomainName left, DomainName right) => !left.Equals(right);
-
+    
     public static bool TryParse(string? value, out DomainName? domainName)
     {
         domainName = default;
@@ -101,6 +86,23 @@ public readonly struct DomainName : IEquatable<DomainName>
             return false;
         }
 
+        domainName = new DomainName(value, null);
+
         return true;
     }
+
+    public bool Equals(DomainName other) =>
+        string.Equals(Value, other.Value, StringComparison.Ordinal);
+
+    public override bool Equals(object? obj) =>
+        obj is DomainName other && Equals(other);
+
+    public override int GetHashCode() =>
+        StringComparer.Ordinal.GetHashCode(Value);
+
+    public override string ToString() => Value;
+
+    public static bool operator ==(DomainName left, DomainName right) => left.Equals(right);
+
+    public static bool operator !=(DomainName left, DomainName right) => !left.Equals(right);
 }

@@ -6,21 +6,17 @@ using static MeridianHost.Domain.Models.Extensions.CreateTarget;
 
 namespace MeridianHost.Domain.Models;
 
-public class SearchTarget
+public sealed class SearchTarget
 {
     public Guid Id { get; private set; }
     public string Value { get; private set; }
     public SearchTargetType TargetType { get; private set; }
-    public DateTimeOffset StartedAt { get; private set; }
-    public DateTimeOffset? FinishedAt { get; private set; }
 
-    private SearchTarget(Guid id, string value, SearchTargetType targetType, DateTimeOffset startedAt, DateTimeOffset? finishedAt)
+    private SearchTarget(Guid id, string value, SearchTargetType targetType)
     {
         Id = id;
         Value = value;
         TargetType = targetType;
-        StartedAt = startedAt;
-        FinishedAt = finishedAt;
     }
 
     public static Result<SearchTarget> Create(string value)
@@ -31,16 +27,16 @@ public class SearchTarget
 
         return value switch
         {
+            _ when IPAddress.TryParse(value, out var ip) => CreateIpAddress(value),
             _ when DomainName.TryParse(value, out var domainName) => CreateDomainName(value),
             _ when Username.TryParse(value, out var userName) => CreateUsername(value),
             _ when Email.TryParse(value, out var email) => CreateEmail(value),
-            _ when IPAddress.TryParse(value, out var ip) => CreateIpAddress(value),
             _ => Result.Failure<SearchTarget>("invalid value")
         };
     }
 
     internal static SearchTarget CreateValidated(string value, SearchTargetType type) =>
-        new(Guid.NewGuid(), value, type, DateTimeOffset.UtcNow, null);
+        new(Guid.NewGuid(), value, type);
 
     public static Result Validate(string value)
     {

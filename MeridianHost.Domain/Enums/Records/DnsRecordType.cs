@@ -1,6 +1,6 @@
 ﻿namespace MeridianHost.Domain.Enums.Records;
 
-public enum RecordType
+public enum DnsRecordType
 {
     A,
     AAAA,

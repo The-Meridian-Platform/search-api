@@ -3,14 +3,14 @@ using MeridianHost.Domain.Enums.Records;
 
 namespace MeridianHost.Domain.VO.Additional;
 
-public readonly struct Record
+public readonly struct DnsRecord
 {
-    public RecordType Type { get; }
+    public DnsRecordType Type { get; }
     public string HostName { get; }
     public string Value { get; }
     public int TTL { get; }
 
-    private Record(RecordType type, string hostName, string value, int ttl)
+    private DnsRecord(DnsRecordType type, string hostName, string value, int ttl)
     {
         Type = type;
         HostName = hostName;
@@ -18,13 +18,13 @@ public readonly struct Record
         TTL = ttl;
     }
 
-    public static Result<Record> Create(RecordType type, string hostName, string value, int ttl)
+    public static Result<DnsRecord> Create(DnsRecordType type, string hostName, string value, int ttl)
     {
         var validationResult = Validate(hostName, value, ttl);
         if (validationResult.IsFailure)
-            return Result.Failure<Record>($"Error: {validationResult.Error}");
+            return Result.Failure<DnsRecord>($"Error: {validationResult.Error}");
 
-        return Result.Success(new Record(type, hostName, value, ttl));
+        return Result.Success(new DnsRecord(type, hostName, value, ttl));
     }
 
     public static Result Validate(string hostName, string value, int ttl)

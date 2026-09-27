@@ -36,22 +36,7 @@ public readonly struct Username : IEquatable<Username>
 
         return Result.Success();
     }
-
-    public bool Equals(Username other) =>
-        string.Equals(Value, other.Value, StringComparison.Ordinal);
-
-    public override bool Equals(object? obj) =>
-        obj is Username other && Equals(other);
-
-    public override int GetHashCode() =>
-        StringComparer.Ordinal.GetHashCode(Value);
-
-    public override string ToString() => Value;
-
-    public static bool operator ==(Username left, Username right) => left.Equals(right);
-
-    public static bool operator !=(Username left, Username right) => !left.Equals(right);
-
+    
     public static bool TryParse(string? value, out Username? userName)
     {
         userName = default;
@@ -72,4 +57,19 @@ public readonly struct Username : IEquatable<Username>
 
         return true;
     }
+
+    public bool Equals(Username other) =>
+        string.Equals(Value, other.Value, StringComparison.Ordinal);
+
+    public override bool Equals(object? obj) =>
+        obj is Username other && Equals(other);
+
+    public override int GetHashCode() =>
+        StringComparer.Ordinal.GetHashCode(Value);
+
+    public override string ToString() => Value;
+
+    public static bool operator ==(Username left, Username right) => left.Equals(right);
+
+    public static bool operator !=(Username left, Username right) => !left.Equals(right);
 }
