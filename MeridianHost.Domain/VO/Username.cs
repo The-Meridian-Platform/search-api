@@ -51,4 +51,25 @@ public readonly struct Username : IEquatable<Username>
     public static bool operator ==(Username left, Username right) => left.Equals(right);
 
     public static bool operator !=(Username left, Username right) => !left.Equals(right);
+
+    public static bool TryParse(string? value, out Username? userName)
+    {
+        userName = default;
+        
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+        
+        value = value.Trim();
+        
+        if (value.Length is < 3 or > 64)
+            return false;
+
+        if (value.Any(character =>
+                !char.IsLetterOrDigit(character) && character is not '_' and not '-' and not '.'))
+            return false;
+
+        userName = new Username(value);
+
+        return true;
+    }
 }

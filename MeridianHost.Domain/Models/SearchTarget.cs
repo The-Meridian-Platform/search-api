@@ -1,6 +1,7 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Net;
+using CSharpFunctionalExtensions;
 using MeridianHost.Domain.Enums;
-
+using MeridianHost.Domain.VO;
 using static MeridianHost.Domain.Models.Extensions.CreateTarget;
 
 namespace MeridianHost.Domain.Models;
@@ -22,19 +23,19 @@ public class SearchTarget
         FinishedAt = finishedAt;
     }
 
-    public static Result<SearchTarget> Create(string value, SearchTargetType type)
+    public static Result<SearchTarget> Create(string value)
     {
         var validationResult = Validate(value);
         if (validationResult.IsFailure)
             return Result.Failure<SearchTarget>($"Error: {validationResult.Error}");
 
-        return type switch
+        return value switch
         {
-            SearchTargetType.Email => CreateEmail(value),
-            SearchTargetType.Username => CreateUsername(value),
-            SearchTargetType.IpAddress => CreateIpAddress(value),
-            SearchTargetType.Domain => CreateDomainName(value),
-            _ => Result.Failure<SearchTarget>("Unsupported search target type.")
+            _ when DomainName.TryParse(value, out var domainName) => CreateDomainName(value),
+            _ when Username.TryParse(value, out var userName) => CreateUsername(value),
+            _ when Email.TryParse(value, out var email) => CreateEmail(value),
+            _ when IPAddress.TryParse(value, out var ip) => CreateIpAddress(value),
+            _ => Result.Failure<SearchTarget>("invalid value")
         };
     }
 

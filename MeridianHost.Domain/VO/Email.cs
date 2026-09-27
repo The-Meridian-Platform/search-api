@@ -30,4 +30,25 @@ public readonly struct Email
         
         return Result.Success();
     }
+
+    public static bool TryParse(string? value, out Email? email)
+    {
+        email = default;
+        
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        value = value.Trim();
+
+        if (value.Length is < 3 or > 128)
+            return false;
+
+        var atIndex = value.IndexOf('@');
+
+        if (atIndex <= 0 || atIndex == value.Length - 1)
+            return false;
+
+        email = new Email(value);
+        return true;
+    }
 }
