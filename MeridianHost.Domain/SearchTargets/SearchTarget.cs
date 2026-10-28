@@ -19,21 +19,34 @@ public sealed class SearchTarget
         TargetType = targetType;
     }
 
-    public static Result<SearchTarget> Create(string value)
+    public static Result<SearchTarget> Create(string value, SearchTargetType? targetType)
     {
         var validationResult = Validate(value);
         if (validationResult.IsFailure)
             return Result.Failure<SearchTarget>($"Error: {validationResult.Error}");
 
-        return value switch
+        return targetType switch
         {
-            _ when IPAddress.TryParse(value, out var ip) => CreateIpAddress(value),
-            _ when DomainName.TryParse(value, out var domainName) => CreateDomainName(value),
-            _ when Username.TryParse(value, out var userName) => CreateUsername(value),
-            _ when Email.TryParse(value, out var email) => CreateEmail(value),
+            _ when IPAddress.TryParse(value, out var ip) => CreateIpAddress(value!),
+            _ when DomainName.TryParse(value, out var domainName) => CreateDomainName(value!),
+            _ when Username.TryParse(value, out var userName) => CreateUsername(value!),
+            _ when Email.TryParse(value, out var email) => CreateEmail(value!),
+            
+            null => DetectType(value!),
+            
             _ => Result.Failure<SearchTarget>("invalid value")
         };
     }
+
+    public static Result<SearchTarget> DetectType(string value)
+        => value switch
+        {
+            _ when IPAddress.TryParse(value, out var ip) => CreateIpAddress(value),
+            _ when Email.TryParse(value, out var email) => CreateEmail(value),
+            _ when DomainName.TryParse(value, out var domainName) => CreateDomainName(value),
+            _ when Username.TryParse(value, out var userName) => CreateUsername(value),
+            _ => Result.Failure<SearchTarget>("invalid value")
+        };
 
     public static SearchTarget Load(Guid id, string value, SearchTargetType targetType)
         => new SearchTarget(id, value, targetType);
