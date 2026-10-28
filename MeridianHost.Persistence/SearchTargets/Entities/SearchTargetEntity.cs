@@ -1,7 +1,6 @@
-﻿using MeridianHost.Domain.Enums;
-using MeridianHost.Domain.Models;
+﻿using MeridianHost.Domain.SearchTargets.Enum;
 
-namespace MeridianHost.Persistence.Entities;
+namespace MeridianHost.Persistence.SearchTargets.Entities;
 
 public sealed class SearchTargetEntity
 {

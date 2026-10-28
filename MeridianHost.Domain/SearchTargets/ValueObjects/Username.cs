@@ -1,7 +1,6 @@
 using CSharpFunctionalExtensions;
-using MeridianHost.Domain.VO.Additional;
 
-namespace MeridianHost.Domain.VO;
+namespace MeridianHost.Domain.SearchTargets.ValueObjects;
 
 public readonly struct Username : IEquatable<Username>
 {

@@ -1,8 +1,8 @@
-﻿using MeridianHost.Persistence.Entities;
+﻿using MeridianHost.Persistence.SearchTargets.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace MeridianHost.Persistence.Configurations;
+namespace MeridianHost.Persistence.SearchTargets.Configurations;
 
 public class SearchTargetConfiguration : IEntityTypeConfiguration<SearchTargetEntity>
 {

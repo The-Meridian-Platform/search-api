@@ -1,7 +1,7 @@
-﻿using MeridianHost.Domain.Models;
-using MeridianHost.Persistence.Entities;
+﻿using MeridianHost.Domain.SearchTargets;
+using MeridianHost.Persistence.SearchTargets.Entities;
 
-namespace MeridianHost.Persistence.Mappers;
+namespace MeridianHost.Persistence.SearchTargets.Mappers;
 
 public static class SearchTargetMapper
 {

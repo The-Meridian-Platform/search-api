@@ -1,8 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 
-namespace MeridianHost.Domain.VO;
+namespace MeridianHost.Domain.SearchTargets.ValueObjects;
 
-public readonly struct Email
+public readonly struct Email : IEquatable<Email>
 {
     public string Value { get; }
 
@@ -57,4 +57,19 @@ public readonly struct Email
         email = new Email(value);
         return true;
     }
+    
+    public bool Equals(Email other) =>
+        string.Equals(Value, other.Value, StringComparison.Ordinal);
+
+    public override bool Equals(object? obj) =>
+        obj is Email other && Equals(other);
+
+    public override int GetHashCode() =>
+        StringComparer.Ordinal.GetHashCode(Value);
+
+    public override string ToString() => Value;
+
+    public static bool operator ==(Email left, Email right) => left.Equals(right);
+
+    public static bool operator !=(Email left, Email right) => !left.Equals(right);
 }

@@ -1,8 +1,8 @@
-﻿using MeridianHost.Persistence.Entities;
+﻿using MeridianHost.Persistence.SearchSessions.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace MeridianHost.Persistence.Configurations;
+namespace MeridianHost.Persistence.SearchSessions.Configurations;
 
 public class SearchSessionConfiguration : IEntityTypeConfiguration<SearchSessionEntity>
 {

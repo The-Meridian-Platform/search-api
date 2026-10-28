@@ -1,4 +1,4 @@
-﻿namespace MeridianHost.Domain.Enums;
+﻿namespace MeridianHost.Domain.SearchSessions.Enum;
 
 public enum Status
 {

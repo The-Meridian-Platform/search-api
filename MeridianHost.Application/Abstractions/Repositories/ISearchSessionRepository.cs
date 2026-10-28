@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using MeridianHost.Domain.Models;
+using MeridianHost.Domain.SearchSessions;
 
 namespace MeridianHost.Application.Abstractions.Repositories;
 

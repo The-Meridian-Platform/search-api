@@ -1,6 +1,7 @@
-﻿using MeridianHost.Domain.Enums;
+﻿using MeridianHost.Domain.SearchSessions.Enum;
+using MeridianHost.Persistence.SearchTargets.Entities;
 
-namespace MeridianHost.Persistence.Entities;
+namespace MeridianHost.Persistence.SearchSessions.Entities;
 
 public sealed class SearchSessionEntity
 {

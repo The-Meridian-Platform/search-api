@@ -1,4 +1,4 @@
-﻿namespace MeridianHost.Domain.Enums.Records;
+﻿namespace MeridianHost.Domain.SearchTargets.Enum;
 
 public enum DnsRecordType
 {

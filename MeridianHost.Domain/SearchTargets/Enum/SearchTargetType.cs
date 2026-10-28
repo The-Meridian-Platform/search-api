@@ -1,4 +1,4 @@
-﻿namespace MeridianHost.Domain.Enums;
+﻿namespace MeridianHost.Domain.SearchTargets.Enum;
 
 public enum SearchTargetType
 {

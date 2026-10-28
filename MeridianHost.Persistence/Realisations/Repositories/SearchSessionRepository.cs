@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using MeridianHost.Application.Abstractions.Repositories;
-using MeridianHost.Domain.Models;
-using MeridianHost.Persistence.Mappers;
+using MeridianHost.Domain.SearchSessions;
+using MeridianHost.Persistence.SearchSessions.Mappers;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeridianHost.Persistence.Realisations.Repositories;

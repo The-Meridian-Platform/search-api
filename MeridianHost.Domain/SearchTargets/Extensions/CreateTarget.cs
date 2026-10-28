@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using CSharpFunctionalExtensions;
-using MeridianHost.Domain.Enums;
-using MeridianHost.Domain.VO;
+using MeridianHost.Domain.SearchTargets.Enum;
+using MeridianHost.Domain.SearchTargets.ValueObjects;
 
-namespace MeridianHost.Domain.Models.Extensions;
+namespace MeridianHost.Domain.SearchTargets.Extensions;
 
 public static class CreateTarget
 {

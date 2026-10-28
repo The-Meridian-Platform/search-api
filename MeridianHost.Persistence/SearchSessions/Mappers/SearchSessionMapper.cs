@@ -1,7 +1,8 @@
-﻿using MeridianHost.Domain.Models;
-using MeridianHost.Persistence.Entities;
+﻿using MeridianHost.Domain.SearchSessions;
+using MeridianHost.Persistence.SearchSessions.Entities;
+using MeridianHost.Persistence.SearchTargets.Mappers;
 
-namespace MeridianHost.Persistence.Mappers;
+namespace MeridianHost.Persistence.SearchSessions.Mappers;
 
 public static class SearchSessionMapper
 {

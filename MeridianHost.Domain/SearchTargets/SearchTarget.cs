@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using CSharpFunctionalExtensions;
-using MeridianHost.Domain.Enums;
-using MeridianHost.Domain.VO;
-using static MeridianHost.Domain.Models.Extensions.CreateTarget;
+using MeridianHost.Domain.SearchTargets.Enum;
+using MeridianHost.Domain.SearchTargets.ValueObjects;
+using static MeridianHost.Domain.SearchTargets.Extensions.CreateTarget;
 
-namespace MeridianHost.Domain.Models;
+namespace MeridianHost.Domain.SearchTargets;
 
 public sealed class SearchTarget
 {

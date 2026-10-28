@@ -1,7 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
-using MeridianHost.Domain.Enums;
+using MeridianHost.Domain.SearchSessions.Enum;
+using MeridianHost.Domain.SearchTargets;
 
-namespace MeridianHost.Domain.Models;
+namespace MeridianHost.Domain.SearchSessions;
 
 public sealed class SearchSession
 {

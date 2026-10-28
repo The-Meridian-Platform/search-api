@@ -1,6 +1,7 @@
-﻿using MeridianHost.Domain.Models;
-using MeridianHost.Persistence.Configurations;
-using MeridianHost.Persistence.Entities;
+﻿using MeridianHost.Persistence.SearchSessions.Configurations;
+using MeridianHost.Persistence.SearchSessions.Entities;
+using MeridianHost.Persistence.SearchTargets.Configurations;
+using MeridianHost.Persistence.SearchTargets.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeridianHost.Persistence;
