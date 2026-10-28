@@ -1,3 +1,4 @@
-﻿namespace MeridianHost.Application.SearchSessions.Create;
+﻿namespace MeridianHost.Application.SearchSessions.Create.Contracts;
 
-public record CreateSearchSessionRequest();
+public record CreateSearchSessionRequest(
+    string Value);

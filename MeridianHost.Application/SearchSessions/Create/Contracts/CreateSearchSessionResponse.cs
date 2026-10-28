@@ -1,6 +1,3 @@
 ﻿namespace MeridianHost.Application.SearchSessions.Create.Contracts;
 
-public class CreateSearchSessionResponse
-{
-    
-}
+public record CreateSearchSessionResponse(Guid SearchSessionId);
