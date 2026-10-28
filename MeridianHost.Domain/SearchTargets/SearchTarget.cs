@@ -38,7 +38,7 @@ public sealed class SearchTarget
         };
     }
 
-    public static Result<SearchTarget> DetectType(string value)
+    private static Result<SearchTarget> DetectType(string value)
         => value switch
         {
             _ when IPAddress.TryParse(value, out var ip) => CreateIpAddress(value),

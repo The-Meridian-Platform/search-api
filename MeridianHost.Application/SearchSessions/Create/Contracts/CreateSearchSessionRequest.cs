@@ -1,4 +1,5 @@
-﻿namespace MeridianHost.Application.SearchSessions.Create.Contracts;
+﻿using MeridianHost.Domain.SearchTargets.Enum;
 
-public record CreateSearchSessionRequest(
-    string Value);
+namespace MeridianHost.Application.SearchSessions.Create.Contracts;
+
+public record CreateSearchSessionRequest(string Value, SearchTargetType? TargetType);
