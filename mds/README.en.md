@@ -126,3 +126,12 @@ dotnet run --project MeridianHost.Api
 - Pass `CancellationToken` through every I/O operation and provider call.
 - Providers do not write directly to UI or persistence; Application orchestrates results.
 - Respect provider terms, rate limits, privacy, and applicable law.
+
+---
+
+## 📄 Licensing (Dual-License)
+
+This project is dual-licensed:
+
+1. **Open Source (GNU AGPLv3)**: Free for personal use, research, and open-source projects. If you modify this project or run it as a network service, you must release your complete modified source code under the AGPLv3.
+2. **Commercial License**: For proprietary commercial use, running a private SaaS/cloud service without disclosing source code, or dedicated enterprise support — contact The Meridian Platform Team.
