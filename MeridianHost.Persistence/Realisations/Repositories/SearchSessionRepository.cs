@@ -41,6 +41,10 @@ public class SearchSessionRepository(AppDbContext dbContext) : ISearchSessionRep
 
     public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
+        var check = await _dbContext.SearchSessions.AnyAsync(s => s.Id == id, cancellationToken);
+        if (!check)
+            return Result.Failure("Search session does not exist");
+        
         await _dbContext.SearchSessions.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken);
 
         return Result.Success();
