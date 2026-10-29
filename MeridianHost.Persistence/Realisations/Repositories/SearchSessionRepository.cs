@@ -1,5 +1,5 @@
-﻿using CSharpFunctionalExtensions;
-using MeridianHost.Application.Abstractions.Repositories;
+using CSharpFunctionalExtensions;
+using MeridianHost.Application.SearchSessions.Execute.Repositories;
 using MeridianHost.Domain.SearchSessions;
 using MeridianHost.Persistence.SearchSessions.Mappers;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +13,7 @@ public class SearchSessionRepository(AppDbContext dbContext) : ISearchSessionRep
     public async Task<Result> AddAsync(SearchSession searchSession, CancellationToken cancellationToken)
     {
         await _dbContext.SearchSessions.AddAsync(searchSession.Map(), cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
@@ -21,6 +22,7 @@ public class SearchSessionRepository(AppDbContext dbContext) : ISearchSessionRep
     {
         var result = await _dbContext.SearchSessions
             .AsNoTracking()
+            .Include(s => s.Target)
             .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
 
         return result is not null
@@ -32,21 +34,20 @@ public class SearchSessionRepository(AppDbContext dbContext) : ISearchSessionRep
     {
         var result = await _dbContext.SearchSessions
             .AsNoTracking()
+            .Include(s => s.Target)
             .ToListAsync(cancellationToken);
         
-        return result.Count != 0
-            ? Result.Success(result.Select(x => x.Map()).ToList())
-            : Result.Failure<List<SearchSession>>("not found");
+        return Result.Success(result.Select(x => x.Map()).ToList());
     }
 
     public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
-        var check = await _dbContext.SearchSessions.AnyAsync(s => s.Id == id, cancellationToken);
-        if (!check)
-            return Result.Failure("Search session does not exist");
-        
-        await _dbContext.SearchSessions.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken);
+        var deletedRows = await _dbContext.SearchSessions
+            .Where(x => x.Id == id)
+            .ExecuteDeleteAsync(cancellationToken);
 
-        return Result.Success();
+        return deletedRows > 0
+            ? Result.Success()
+            : Result.Failure("Search session does not exist");
     }
 }

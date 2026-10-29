@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using MeridianHost.Domain.SearchSessions;
 
-namespace MeridianHost.Application.Abstractions.Repositories;
+namespace MeridianHost.Application.SearchSessions.Execute.Repositories;
 
 public interface ISearchSessionRepository
 {

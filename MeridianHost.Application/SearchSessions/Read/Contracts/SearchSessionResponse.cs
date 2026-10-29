@@ -3,7 +3,7 @@ using MeridianHost.Domain.SearchSessions.Enum;
 
 namespace MeridianHost.Application.SearchSessions.Read.Contracts;
 
-public record SearchSessionResponse(
+public sealed record SearchSessionResponse(
     Guid Id,
     SearchTargetResponse Target,
     Status Status,

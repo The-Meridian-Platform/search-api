@@ -2,4 +2,4 @@
 
 namespace MeridianHost.Application.SearchSessions.Create.Contracts;
 
-public record CreateSearchSessionRequest(string Value, SearchTargetType? TargetType);
+public sealed record CreateSearchSessionRequest(string Value, SearchTargetType? TargetType);

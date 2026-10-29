@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using CSharpFunctionalExtensions;
 using MeridianHost.Domain.SearchTargets.Enum;
 using MeridianHost.Domain.SearchTargets.ValueObjects;
@@ -27,24 +27,22 @@ public sealed class SearchTarget
 
         return targetType switch
         {
-            _ when IPAddress.TryParse(value, out var ip) => CreateIpAddress(value!),
-            _ when DomainName.TryParse(value, out var domainName) => CreateDomainName(value!),
-            _ when Username.TryParse(value, out var userName) => CreateUsername(value!),
-            _ when Email.TryParse(value, out var email) => CreateEmail(value!),
-            
-            null => DetectType(value!),
-            
-            _ => Result.Failure<SearchTarget>("invalid value")
+            SearchTargetType.IpAddress => CreateIpAddress(value),
+            SearchTargetType.Domain => CreateDomainName(value),
+            SearchTargetType.Username => CreateUsername(value),
+            SearchTargetType.Email => CreateEmail(value),
+            null => DetectType(value),
+            _ => Result.Failure<SearchTarget>("invalid target type")
         };
     }
 
     private static Result<SearchTarget> DetectType(string value)
         => value switch
         {
-            _ when IPAddress.TryParse(value, out var ip) => CreateIpAddress(value),
-            _ when Email.TryParse(value, out var email) => CreateEmail(value),
-            _ when DomainName.TryParse(value, out var domainName) => CreateDomainName(value),
-            _ when Username.TryParse(value, out var userName) => CreateUsername(value),
+            _ when IPAddress.TryParse(value, out _) => CreateIpAddress(value),
+            _ when Email.TryParse(value, out _) => CreateEmail(value),
+            _ when DomainName.TryParse(value, out _) => CreateDomainName(value),
+            _ when Username.TryParse(value, out _) => CreateUsername(value),
             _ => Result.Failure<SearchTarget>("invalid value")
         };
 

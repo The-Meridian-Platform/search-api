@@ -1,4 +1,4 @@
-﻿using MeridianHost.Persistence.SearchSessions.Entities;
+using MeridianHost.Persistence.SearchSessions.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,7 +12,7 @@ public class SearchSessionConfiguration : IEntityTypeConfiguration<SearchSession
 
         builder.HasOne(x => x.Target)
             .WithOne()
-            .HasForeignKey<SearchSessionEntity>(x => x.Id)
+            .HasForeignKey<SearchSessionEntity>(x => x.TargetId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 

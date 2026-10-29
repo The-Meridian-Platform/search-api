@@ -53,6 +53,8 @@ public readonly struct DomainName : IEquatable<DomainName>
             return Result.Failure("Domain name must be between 3 and 253 characters.");
 
         var labels = value.Split('.');
+        if (labels.Length < 2)
+            return Result.Failure("Domain name must contain at least two labels.");
 
         if (labels.Any(label =>
                 label.Length is < 1 or > 63 ||
@@ -79,6 +81,8 @@ public readonly struct DomainName : IEquatable<DomainName>
             return false;
 
         var labels = value.Split('.');
+        if (labels.Length < 2)
+            return false;
 
         if (labels.Any(label =>
                 label.Length is < 1 or > 63 ||

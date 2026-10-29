@@ -1,4 +1,4 @@
-﻿using MeridianHost.Domain.SearchSessions;
+using MeridianHost.Domain.SearchSessions;
 using MeridianHost.Persistence.SearchSessions.Entities;
 using MeridianHost.Persistence.SearchTargets.Mappers;
 
@@ -19,6 +19,7 @@ public static class SearchSessionMapper
         => new SearchSessionEntity
         {
             Id = domain.Id,
+            TargetId = domain.Target.Id,
             Target = domain.Target.Map(),
             SearchStatus = domain.SearchStatus,
             CreatedAt = domain.CreatedAt,

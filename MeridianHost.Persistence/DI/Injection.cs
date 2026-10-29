@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,8 +17,8 @@ public static class Injection
         });
 
         services.Scan(scan => scan
-            .FromAssemblies()
-            .AddClasses(classes => classes.Where(type => type.Name.EndsWith("Repository")))
+            .FromAssemblies(typeof(Injection).Assembly)
+            .AddClasses(classes => classes.Where(type => type.Name.EndsWith("Repository", StringComparison.Ordinal)))
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 

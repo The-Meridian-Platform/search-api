@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using MeridianHost.Application.Abstractions.Repositories;
+using MeridianHost.Application.SearchSessions.Execute.Repositories;
 
 namespace MeridianHost.Application.SearchSessions.Delete.Handlers;
 

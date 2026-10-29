@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
-using MeridianHost.Application.Abstractions.Repositories;
 using MeridianHost.Application.SearchSessions.Create.Contracts;
+using MeridianHost.Application.SearchSessions.Execute.Repositories;
 using MeridianHost.Domain.SearchSessions;
 using MeridianHost.Domain.SearchTargets;
 
