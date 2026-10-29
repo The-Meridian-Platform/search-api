@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using FluentValidation;
 using MeridianHost.Application.SearchSessions.Create.Contracts;
+using MeridianHost.Application.SearchSessions.Execute.Queue;
 using MeridianHost.Application.SearchSessions.Execute.Repositories;
 using MeridianHost.Domain.SearchSessions;
 using MeridianHost.Domain.SearchTargets;
@@ -9,10 +10,12 @@ namespace MeridianHost.Application.SearchSessions.Create.Handlers;
 
 public class CreateSearchSessionHandler(
     ISearchSessionRepository repository,
-    IValidator<CreateSearchSessionRequest> validator)
+    IValidator<CreateSearchSessionRequest> validator,
+    ISearchWorkQueue searchWorkQueue)
 {
     private readonly ISearchSessionRepository _repository = repository;
     private readonly IValidator<CreateSearchSessionRequest> _validator = validator;
+    private readonly ISearchWorkQueue _workQueue = searchWorkQueue;
     
     public async Task<Result<CreateSearchSessionResponse>> HandleAsync(
         CreateSearchSessionRequest request,
@@ -32,6 +35,8 @@ public class CreateSearchSessionHandler(
             return Result.Failure<CreateSearchSessionResponse>(searchSession.Error);
 
         await _repository.AddAsync(searchSession.Value, cancellationToken);
+
+        await _workQueue.EnqueueAsync(searchSession.Value.Id, cancellationToken);
 
         return Result.Success(new CreateSearchSessionResponse(searchSession.Value.Id));
     }
