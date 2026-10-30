@@ -2,6 +2,7 @@
 using MeridianHost.Application.SearchSessions.Execute.Queue;
 using MeridianHost.Infrastructure.SearchSessions.Providers.Realisations;
 using MeridianHost.Infrastructure.SearchSessions.Queue;
+using MeridianHost.Infrastructure.SearchSessions.Workers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MeridianHost.Infrastructure.DI;
@@ -14,6 +15,8 @@ public static class Injection
 
         services.AddHttpClient<DomainSearchProvider>();
         services.AddTransient<ISearchProvider>(sp => sp.GetRequiredService<DomainSearchProvider>());
+
+        services.AddHostedService<SearchExecutionWorker>();
         
         return services;
     }
