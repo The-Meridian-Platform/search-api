@@ -12,6 +12,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Scalar.AspNetCore" Version="2.18.6" />
     </ItemGroup>
 
     <ItemGroup>
@@ -22,7 +23,6 @@
 
     <ItemGroup>
       <Folder Include="Common\" />
-      <Folder Include="Endpoints\" />
       <Folder Include="Grpc\" />
       <Folder Include="Middlewares\" />
       <Folder Include="ServiceCollections\" />
