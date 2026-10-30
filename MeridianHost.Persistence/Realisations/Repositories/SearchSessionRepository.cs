@@ -40,6 +40,21 @@ public class SearchSessionRepository(AppDbContext dbContext) : ISearchSessionRep
         return Result.Success(result.Select(x => x.Map()).ToList());
     }
 
+    public async Task<Result> UpdateAsync(SearchSession searchSession, CancellationToken cancellationToken)
+    {
+        var updatedRows = await _dbContext.SearchSessions
+            .Where(x => x.Id == searchSession.Id)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(x => x.SearchStatus, searchSession.SearchStatus)
+                .SetProperty(x => x.StartedAt, searchSession.StartedAt)
+                .SetProperty(x => x.FinishedAt, searchSession.FinishedAt),
+                cancellationToken);
+            
+        return updatedRows  > 0
+            ? Result.Success()
+            : Result.Failure<SearchSession>("Search session does not exist");
+    }
+
     public async Task<Result> DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
         var deletedRows = await _dbContext.SearchSessions
