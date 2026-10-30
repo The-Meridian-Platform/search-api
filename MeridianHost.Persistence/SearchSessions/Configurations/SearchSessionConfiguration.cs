@@ -16,6 +16,12 @@ public class SearchSessionConfiguration : IEntityTypeConfiguration<SearchSession
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(x => x.Findings)
+            .WithOne(f => f.SearchSession)
+            .HasForeignKey(f => f.SearchSessionId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.Property(x => x.SearchStatus)
             .HasConversion<string>()
             .HasMaxLength(32)

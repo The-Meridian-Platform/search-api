@@ -1,6 +1,7 @@
 ﻿using MeridianHost.Application.SearchSessions.Execute.Providers;
 using MeridianHost.Application.SearchSessions.Execute.Queue;
 using MeridianHost.Application.SearchSessions.Execute.Repositories;
+using MeridianHost.Domain.SearchFindings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -41,7 +42,7 @@ public class SearchExecutionWorker(
         using var scope = _scopeFactory.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<ISearchSessionRepository>();
 
-        var sessionResult = await repository.GetByIdAsync(searchSessionId, cancellationToken);
+        var sessionResult = await repository.GetByIdAsync(searchSessionId, false, cancellationToken);
         if (sessionResult.IsFailure)
         {
             _logger.LogWarning("Session {SearchSessionId} not found", searchSessionId);
@@ -68,6 +69,21 @@ public class SearchExecutionWorker(
             await foreach (var finding in provider.ReadAllAsync(session.Target, cancellationToken))
             {
                 _logger.LogInformation("[{Key}] found ({Type}): {Data}", provider.Key, finding.Type, finding.DataJson);
+
+                var findingModel = SearchFinding.Create(
+                    searchSessionId,
+                    provider.Key,
+                    finding.Type,
+                    finding.DataJson);
+                if (findingModel.IsFailure)
+                {
+                    _logger.LogWarning("Failed to create search finding: {Error}", findingModel.Error);
+                    return;
+                }
+                
+                session.AddFinding(findingModel.Value);
+                
+                await repository.AddFindingAsync(findingModel.Value, cancellationToken);
             }
         }
         

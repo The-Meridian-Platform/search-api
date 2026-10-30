@@ -1,4 +1,5 @@
 using MeridianHost.Domain.SearchSessions;
+using MeridianHost.Persistence.SearchFindings.Mappers;
 using MeridianHost.Persistence.SearchSessions.Entities;
 using MeridianHost.Persistence.SearchTargets.Mappers;
 
@@ -10,6 +11,7 @@ public static class SearchSessionMapper
         => SearchSession.Load(
             entity.Id,
             entity.Target.Map(),
+            entity.Findings.Select(x => x.Map()).ToList(),
             entity.SearchStatus,
             entity.CreatedAt,
             entity.StartedAt,
@@ -21,6 +23,7 @@ public static class SearchSessionMapper
             Id = domain.Id,
             TargetId = domain.Target.Id,
             Target = domain.Target.Map(),
+            Findings = domain.Findings.Select(x => x.Map()).ToList(),
             SearchStatus = domain.SearchStatus,
             CreatedAt = domain.CreatedAt,
             StartedAt = domain.StartedAt,

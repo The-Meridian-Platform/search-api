@@ -1,6 +1,9 @@
 using CSharpFunctionalExtensions;
 using MeridianHost.Application.SearchSessions.Execute.Repositories;
+using MeridianHost.Domain.SearchFindings;
 using MeridianHost.Domain.SearchSessions;
+using MeridianHost.Persistence.SearchFindings.Mappers;
+using MeridianHost.Persistence.SearchSessions.Entities;
 using MeridianHost.Persistence.SearchSessions.Mappers;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,25 +21,44 @@ public class SearchSessionRepository(AppDbContext dbContext) : ISearchSessionRep
         return Result.Success();
     }
 
-    public async Task<Result<SearchSession>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Result> AddFindingAsync(SearchFinding searchFinding, CancellationToken cancellationToken)
     {
-        var result = await _dbContext.SearchSessions
+        await _dbContext.SearchFindings.AddAsync(searchFinding.Map(), cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+
+    public async Task<Result<SearchSession>> GetByIdAsync(Guid id, bool includeFindings, CancellationToken cancellationToken)
+    {
+        IQueryable<SearchSessionEntity> query = _dbContext.SearchSessions
             .AsNoTracking()
-            .Include(s => s.Target)
-            .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+            .Include(s => s.Target);
+
+        if (includeFindings)
+        {
+            query = query.Include(s => s.Findings);
+        }
+
+        var result = await query.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
 
         return result is not null
             ? Result.Success(result.Map())
             : Result.Failure<SearchSession>("not found");
     }
 
-    public async Task<Result<List<SearchSession>>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<Result<List<SearchSession>>> GetAllAsync(bool includeFindings, CancellationToken cancellationToken)
     {
-        var result = await _dbContext.SearchSessions
+        IQueryable<SearchSessionEntity> query = _dbContext.SearchSessions
             .AsNoTracking()
-            .Include(s => s.Target)
-            .ToListAsync(cancellationToken);
-        
+            .Include(s => s.Target);
+
+        if (includeFindings)
+        {
+            query = query.Include(s => s.Findings);
+        }
+
+        var result = await query.ToListAsync(cancellationToken);
         return Result.Success(result.Select(x => x.Map()).ToList());
     }
 
@@ -50,7 +72,7 @@ public class SearchSessionRepository(AppDbContext dbContext) : ISearchSessionRep
                 .SetProperty(x => x.FinishedAt, searchSession.FinishedAt),
                 cancellationToken);
             
-        return updatedRows  > 0
+        return updatedRows > 0
             ? Result.Success()
             : Result.Failure<SearchSession>("Search session does not exist");
     }
