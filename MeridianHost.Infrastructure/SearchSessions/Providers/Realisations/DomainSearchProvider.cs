@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using MeridianHost.Application.SearchSessions.Execute.Providers;
@@ -9,10 +9,6 @@ using MeridianHost.Infrastructure.SearchSessions.Providers.Contracts;
 
 namespace MeridianHost.Infrastructure.SearchSessions.Providers.Realisations;
 
-/// <summary>
-/// Domain search provider
-/// </summary>
-/// <param name="client"></param>
 public class DomainSearchProvider(HttpClient client) : ISearchProvider
 {
     private readonly HttpClient _client = client;
@@ -26,36 +22,51 @@ public class DomainSearchProvider(HttpClient client) : ISearchProvider
         SearchTarget target, 
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        string[] recordTypes = new[] { "A", "AAAA", "MX", "TXT", "NS", "CNAME"};
+        string[] recordTypes = ["A", "AAAA", "MX", "TXT", "NS", "CNAME"];
 
-        foreach (var recordType in recordTypes)
+        var tasks = recordTypes
+            .Select(type => FetchRecordsAsync(target.Value, type, cancellationToken))
+            .ToArray();
+
+        var results = await Task.WhenAll(tasks);
+
+        foreach (var findingList in results)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            using var request = new HttpRequestMessage(
-                HttpMethod.Get,
-                $"https://cloudflare-dns.com/dns-query?name={target.Value}&type={recordType}");
-            
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/dns-json"));
-            
-            DnsResponse? result;
-
-            try
+            foreach (var finding in findingList)
             {
-                using var response = await _client.SendAsync(request, cancellationToken);
-                if (!response.IsSuccessStatusCode)
-                    continue;
-
-                result = await response.Content.ReadFromJsonAsync<DnsResponse>(cancellationToken);
+                yield return finding;
             }
-
-            catch { continue; }
-            
-            if (result?.Answers is null || result?.Answers.Count == 0) continue;
-
-            foreach (var answer in result!.Answers)
-                yield return new SearchFinding("dns_record", JsonSerializer.Serialize(answer));
         }
     }
-    
+
+    private async Task<List<SearchFinding>> FetchRecordsAsync(
+        string domain, 
+        string recordType, 
+        CancellationToken cancellationToken)
+    {
+        using var request = new HttpRequestMessage(
+            HttpMethod.Get,
+            $"https://cloudflare-dns.com/dns-query?name={domain}&type={recordType}");
+
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/dns-json"));
+
+        try
+        {
+            using var response = await _client.SendAsync(request, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+                return [];
+
+            var result = await response.Content.ReadFromJsonAsync<DnsResponse>(cancellationToken);
+            if (result?.Answers is null || result.Answers.Count == 0)
+                return [];
+
+            return result.Answers
+                .Select(answer => new SearchFinding("dns_record", JsonSerializer.Serialize(answer)))
+                .ToList();
+        }
+        catch
+        {
+            return [];
+        }
+    }
 }
