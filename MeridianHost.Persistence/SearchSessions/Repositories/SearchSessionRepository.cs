@@ -7,7 +7,7 @@ using MeridianHost.Persistence.SearchSessions.Entities;
 using MeridianHost.Persistence.SearchSessions.Mappers;
 using Microsoft.EntityFrameworkCore;
 
-namespace MeridianHost.Persistence.Realisations.Repositories;
+namespace MeridianHost.Persistence.SearchSessions.Repositories;
 
 public class SearchSessionRepository(AppDbContext dbContext) : ISearchSessionRepository
 {
