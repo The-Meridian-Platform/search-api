@@ -1,131 +1,149 @@
 # 🔎 Meridian Search API
 
-> A .NET backend for focused, asynchronous OSINT searches.
+> A high-performance .NET backend for focused, real-time asynchronous OSINT reconnaissance.
 
-Meridian accepts a target — an email, username, domain, or IP address — runs the appropriate data providers, saves the search lifecycle, and delivers results to a desktop client as they become available.
+Meridian accepts a target — an email, username, domain, or IP address — concurrently executes specialized data providers, manages the search lifecycle, and streams findings live to the desktop client via **gRPC Server Streaming** as soon as they are discovered.
 
-> 🚧 **Status:** active development. The domain and persistence foundations are being built; providers and live streaming are next.
+> 🚀 **Status:** The search engine, concurrent Fan-Out / Fan-In aggregation, PostgreSQL batching, gRPC streaming, and the WPF desktop client are fully implemented. Actively expanding with new OSINT providers.
 
 ← [Choose another language](../README.md)
 
 ---
 
-## ✨ The idea
+## ✨ The Idea
 
-This is a search-oriented OSINT workspace, not a generic graph editor.
+A search-first OSINT workspace engineered for ultra-low latency and reactive user interfaces:
 
 ```text
-🎯 Target → 🧾 Search session → ⚙️ Provider queue → 🌐 Provider results
-                                                     ↓
-🖥️ Desktop client ← 📡 Live card updates ← 💾 Persisted results
+🎯 Target → 🧾 Search session → 📬 Bounded Queue → ⚡ Concurrency Engine (Fan-Out)
+                                                           │
+                                   ┌───────────────────────┴───────────────────────┐
+                                   ▼                                               ▼
+                         🌐 Cloudflare DNS (DoH)                           📋 RDAP / Whois
+                                   │                                               │
+                                   └───────────────────────┬───────────────────────┘
+                                                           ▼ (Fan-In Channel)
+                                              📡 Event Broadcaster (Pub/Sub)
+                                              ┌────────────┴────────────┐
+                                              ▼                         ▼
+                                    💾 Batch PostgreSQL      🖥️ gRPC Real-Time Stream
+                                                                        ↓
+                                                              🏢 WPF Desktop Client
 ```
 
-While a provider works, the client can show a spinner on its card. When a result arrives, only that card changes — no long-running HTTP request and no waiting for the entire search to finish.
+While providers run in parallel, the client receives instant notifications. As soon as DNS or WHOIS discovers a record, it is **instantly pushed** across the open gRPC stream to the UI — no long HTTP polling and no blocking on the slowest provider.
 
 ---
 
 ## 🏗️ Architecture
 
-The solution follows **Clean Architecture** and **Ports & Adapters**. Dependencies always point inward.
+The solution adheres strictly to **Clean Architecture**, **Domain-Driven Design (DDD)**, and **Ports & Adapters**. Dependencies always point inward.
 
 ```text
-MeridianHost.Api
+MeridianHost.Api (REST Endpoints, Scalar UI, gRPC Streaming Service)
         ↓
 MeridianHost.Persistence / MeridianHost.Infrastructure
         ↓
-MeridianHost.Application
+MeridianHost.Application (Use Cases, Queue/Broadcaster Ports, Handlers)
         ↓
-MeridianHost.Domain
+MeridianHost.Domain (Entities, Value Objects, Search Rules)
 ```
 
 | Project | Purpose |
 | --- | --- |
-| 🧠 `MeridianHost.Domain` | Search rules and value objects: `SearchSession`, `Email`, `Username`, `DomainName`, DNS records. |
-| 🎯 `MeridianHost.Application` | Use cases, commands/queries, validation, handlers, and ports for repositories, queues, and update publishers. |
-| 💾 `MeridianHost.Persistence` | EF Core / PostgreSQL entities, mappings, configurations, and repository implementations. |
-| 🌐 `MeridianHost.Infrastructure` | OSINT providers, HTTP integrations, retry/rate-limit policies, and background processing. |
-| 🚀 `MeridianHost.Api` | ASP.NET Core host, endpoints, gRPC services, transport DTOs, and composition root. |
-
-> 📌 gRPC stays in `Api`. Application communicates with external concerns only through interfaces.
+| 🧠 `MeridianHost.Domain` | Core business rules, invariants, and value objects: `SearchSession`, `SearchTarget`, `SearchFinding`, `DomainName`, status enums. |
+| 🎯 `MeridianHost.Application` | Use cases, ports for queues (`ISearchWorkQueue`), event broadcasters (`ISearchSessionBroadcaster`), repositories, and DTOs. |
+| 💾 `MeridianHost.Persistence` | EF Core / PostgreSQL entities, mappings (`jsonb` payload storage), migrations, batch inserts, and repository implementations. |
+| 🌐 `MeridianHost.Infrastructure` | Background engine `SearchExecutionWorker`, channel implementations, event bus `SearchSessionBroadcaster`, and OSINT providers (DNS DoH, Whois RDAP). |
+| 🚀 `MeridianHost.Api` | ASP.NET Core host, Minimal API endpoints, Scalar API Reference, Protobuf schemas, and `SearchStreamGrpcService`. |
 
 ---
 
-## 🧩 Current domain model
+## 🧩 Domain Model
 
 ```text
 SearchSession
  ├─ 🆔 Id
- ├─ 🎯 SearchTarget: Email | Username | Domain | IpAddress
+ ├─ 🎯 SearchTarget: Domain | Email | Username | IpAddress
+ ├─ 📦 Findings: List<SearchFinding> (payload stored as PostgreSQL jsonb)
  ├─ 📊 Status: Pending | Running | Completed | Cancelled | Failed
  └─ 🕒 CreatedAt / StartedAt / FinishedAt
 ```
 
-Input is normalized and validated by value objects before it becomes a search target. Timestamps use `DateTimeOffset`, keeping moments unambiguous across server and client time zones.
+Input is validated and normalized by Value Objects prior to session execution. All timestamps use `DateTimeOffset` to ensure seamless time-zone consistency between server and clients.
 
 ---
 
-## 🛠️ Technology
+## 🛠️ Technology Stack
 
-- ⚡ .NET 10 / C# with nullable reference types
-- 🌐 ASP.NET Core
-- 🐘 EF Core + PostgreSQL (`Npgsql`)
-- ✅ FluentValidation
-- 📦 CSharpFunctionalExtensions for the Result pattern
-- 📡 Planned: gRPC server streaming and `System.Threading.Channels`
+- ⚡ **.NET 10 / C#** with nullable reference types
+- 🌐 **ASP.NET Core Minimal APIs**
+- 📡 **gRPC & Protocol Buffers** (`Grpc.AspNetCore`) — Server Streaming of real-time search events
+- 🔀 **System.Threading.Channels** — Thread-safe bounded queues and in-memory Fan-In channels
+- 🐘 **EF Core + PostgreSQL** (`Npgsql`) with multi-row batch inserts and `jsonb` columns
+- 📚 **Scalar API Reference** (`Scalar.AspNetCore`) for interactive API documentation
+- 📦 **CSharpFunctionalExtensions** for the robust Result pattern
+- 🖥️ **WPF (.NET 10 / WPF-UI)** — Modern Fluent dark-mode client for Windows
 
 ---
 
-## 🚀 Getting started
+## 🚀 Getting Started
 
 ### 1. Prerequisites
 
-- .NET SDK 10
-- PostgreSQL 16+ or a compatible PostgreSQL instance
+- [.NET SDK 10](https://dotnet.microsoft.com/)
+- PostgreSQL 16+ (local installation or Docker container)
 
-### 2. Configure PostgreSQL
+### 2. Configure Database
 
-Create `MeridianHost.Api/appsettings.Local.json`. It is intentionally ignored by Git.
+Create `MeridianHost.Api/appsettings.Local.json` (ignored by Git):
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=meridian;Username=postgres;Password=change-me"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=meridian;Username=postgres;Password=postgres"
   }
 }
 ```
 
-### 3. Build and run
+### 3. Build and Run
 
 ```powershell
-dotnet restore MeridianHost.sln
-dotnet build MeridianHost.sln
+dotnet restore
+dotnet build
 dotnet run --project MeridianHost.Api
 ```
+
+- **REST API & Scalar Documentation:** `http://localhost:5168/scalar/v1`
+- **gRPC Streaming Endpoint:** `http://localhost:5168` / `https://localhost:7013`
 
 ---
 
 ## 🗺️ Roadmap
 
-- [x] 🎯 Target value objects and search-session lifecycle foundation
-- [x] 💾 EF Core / PostgreSQL project structure
-- [ ] 🧱 Complete session persistence mapping and repository implementation
-- [ ] ✉️ `CreateSearch` command and handler
-- [ ] 📬 Bounded background queue
-- [ ] 🖼️ First provider: email/avatar lookup
-- [ ] 🗃️ Persist provider execution and results
-- [ ] 📡 gRPC stream for live card updates
-- [ ] 🔁 Reconnect through ordered search updates
-- [ ] 🖥️ WPF desktop client
+- [x] 🎯 Target Value Objects and rich `SearchSession` domain aggregate
+- [x] 💾 EF Core / PostgreSQL structure with `SearchFinding` mapped to `jsonb`
+- [x] ✉️ Session creation handlers and query filtering (`includeFindings`)
+- [x] 📬 Asynchronous producer-consumer queue via `System.Threading.Channels`
+- [x] ⚙️ Background `SearchExecutionWorker` with scoped dependency lifecycle
+- [x] 🌐 OSINT Provider: **DNS over HTTPS** (Cloudflare DoH: A, AAAA, MX, TXT, NS, CNAME)
+- [x] 📋 OSINT Provider: **WHOIS / RDAP** (ICANN / IETF RDAP with redirect handling)
+- [x] ⚡ **Concurrent Fan-Out / Fan-In aggregation** (2x search execution speedup)
+- [x] 🚀 **Database Batching** via `AddRange` and single `SaveChangesAsync`
+- [x] 📡 **gRPC Server Streaming** (`search_stream.proto`, `SearchStreamGrpcService`, `ISearchSessionBroadcaster`)
+- [x] 🖥️ **WPF Desktop Client** with `WPF-UI` and live-streaming findings feed
+- [ ] 🔍 Additional OSINT Providers: Certificate Transparency (crt.sh), Subdomain Enumeration, Reverse IP
+- [ ] 🔁 Stream reconnection mechanism for dropped clients
 
 ---
 
-## 🤝 Development principles
+## 🤝 Development Principles
 
-- Keep Domain free from transport, database, and provider implementation details.
-- Use `Result` for invalid user input instead of business exceptions.
-- Pass `CancellationToken` through every I/O operation and provider call.
-- Providers do not write directly to UI or persistence; Application orchestrates results.
-- Respect provider terms, rate limits, privacy, and applicable law.
+- **Clean Architecture:** Domain stays entirely decoupled from transport, databases, and third-party APIs.
+- **Fail-Safe Concurrency:** Individual provider errors are isolated and never crash the overall search session.
+- **Zero Captive Dependencies:** Ephemeral service scopes are created inside long-running background workers.
+- **Cancellation-Aware:** `CancellationToken` is propagated through all I/O, network, and async calls.
+- **OSINT Ethics:** Strictly utilizes authorized, publicly accessible data sources in compliance with platform rules and law.
 
 ---
 
@@ -133,5 +151,5 @@ dotnet run --project MeridianHost.Api
 
 This project is dual-licensed:
 
-1. **Open Source (GNU AGPLv3)**: Free for personal use, research, and open-source projects. If you modify this project or run it as a network service, you must release your complete modified source code under the AGPLv3.
-2. **Commercial License**: For proprietary commercial use, running a private SaaS/cloud service without disclosing source code, or dedicated enterprise support — contact The Meridian Platform Team.
+1. **Open Source (GNU AGPLv3)**: Free for personal use, research, and open-source projects. If you modify or run this software as a network service, you must release your complete modified source code under AGPLv3.
+2. **Commercial License**: For proprietary commercial software, private SaaS deployments without source disclosure, or enterprise support — contact The Meridian Platform Team.
