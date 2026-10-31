@@ -1,5 +1,6 @@
 ﻿using MeridianHost.Application.SearchSessions.Create.Contracts;
 using MeridianHost.Application.SearchSessions.Create.Handlers;
+using MeridianHost.Application.SearchSessions.Delete.Handlers;
 using MeridianHost.Application.SearchSessions.Read.Handlers;
 
 namespace MeridianHost.Api.Endpoints;
@@ -45,6 +46,18 @@ public static class SearchSessions
             return result.IsSuccess
                 ? Results.Ok(result.Value)
                 : Results.BadRequest(result.Error);
+        });
+
+        group.MapDelete("/{id:guid}", async (
+            Guid id,
+            DeleteSearchSessionHandler handler,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await handler.HandleAsync(id, cancellationToken);
+            
+            return result.IsSuccess
+                ? Results.NoContent()
+                :  Results.BadRequest(result.Error);
         });
 
         return group;
