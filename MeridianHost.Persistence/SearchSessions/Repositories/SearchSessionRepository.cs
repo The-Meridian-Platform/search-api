@@ -15,15 +15,20 @@ public class SearchSessionRepository(AppDbContext dbContext) : ISearchSessionRep
     
     public async Task<Result> AddAsync(SearchSession searchSession, CancellationToken cancellationToken)
     {
-        await _dbContext.SearchSessions.AddAsync(searchSession.Map(), cancellationToken);
+        _dbContext.SearchSessions.Add(searchSession.Map());
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
 
-    public async Task<Result> AddFindingAsync(SearchFinding searchFinding, CancellationToken cancellationToken)
+    public async Task<Result> AddFindingAsync(IEnumerable<SearchFinding> searchFindings,
+        CancellationToken cancellationToken)
     {
-        await _dbContext.SearchFindings.AddAsync(searchFinding.Map(), cancellationToken);
+        var entities = searchFindings.Select(x => x.Map()).ToList();
+        if (entities.Count == 0)
+            return Result.Success();
+
+        _dbContext.SearchFindings.AddRange(entities);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

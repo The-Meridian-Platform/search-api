@@ -115,6 +115,8 @@ public class SearchExecutionWorker(
         }, cancellationToken);
         
         // The only consumer: he proofreads the finds as they are received and saves them in the database
+        var findings = new List<SearchFinding>();
+        
         await foreach (var (providerKey, rawFinding) in channel.Reader.ReadAllAsync(cancellationToken))
         {
             _logger.LogInformation("[{Key}] found ({Type}): {Data}", providerKey, rawFinding.Type, rawFinding.DataJson);
@@ -131,10 +133,13 @@ public class SearchExecutionWorker(
             }
             
             session.AddFinding(findingModel.Value);
-            await repository.AddFindingAsync(findingModel.Value, cancellationToken);
+            findings.Add(findingModel.Value);
         }
 
         await producersTask;
+
+        if (findings.Count > 0)
+            await repository.AddFindingAsync(findings, cancellationToken);
         
         session.Finish();
         await repository.UpdateAsync(session, cancellationToken);

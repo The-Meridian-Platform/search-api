@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Contracts.Dns;
+namespace MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Dns.Contracts;
 
 public sealed class DnsResponse
 {

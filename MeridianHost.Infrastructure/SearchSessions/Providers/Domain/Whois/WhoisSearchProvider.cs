@@ -6,7 +6,7 @@ using MeridianHost.Domain.SearchTargets;
 using MeridianHost.Domain.SearchTargets.Enum;
 using MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Contracts.Whois;
 
-namespace MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Realisations;
+namespace MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Whois;
 
 public class WhoisSearchProvider(HttpClient client) : ISearchProvider
 {

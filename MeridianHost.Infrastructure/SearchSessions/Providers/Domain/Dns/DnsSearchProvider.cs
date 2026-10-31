@@ -5,11 +5,11 @@ using MeridianHost.Application.SearchSessions.Execute.Providers;
 using MeridianHost.Application.SearchSessions.Execute.Providers.Contracts;
 using MeridianHost.Domain.SearchTargets;
 using MeridianHost.Domain.SearchTargets.Enum;
-using MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Contracts.Dns;
+using MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Dns.Contracts;
 
-namespace MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Realisations;
+namespace MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Dns;
 
-public class DomainSearchProvider(HttpClient client) : ISearchProvider
+public class DnsSearchProvider(HttpClient client) : ISearchProvider
 {
     private readonly HttpClient _client = client;
 
