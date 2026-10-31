@@ -1,4 +1,6 @@
-﻿using MeridianHost.Application.SearchSessions.Execute.Providers;
+﻿using System.Threading.Channels;
+using MeridianHost.Application.SearchSessions.Execute.Providers;
+using MeridianHost.Application.SearchSessions.Execute.Providers.Contracts;
 using MeridianHost.Application.SearchSessions.Execute.Queue;
 using MeridianHost.Application.SearchSessions.Execute.Repositories;
 using MeridianHost.Domain.SearchFindings;
@@ -8,6 +10,15 @@ using Microsoft.Extensions.Logging;
 
 namespace MeridianHost.Infrastructure.SearchSessions.Workers;
 
+/// <summary>
+/// The engine of the whole project ^^
+///
+/// In the latest update, the engine has moved from consistency to concurrency
+/// </summary>
+/// <param name="scopeFactory"></param>
+/// <param name="queue"></param>
+/// <param name="providers"></param>
+/// <param name="logger"></param>
 public class SearchExecutionWorker(
     IServiceScopeFactory scopeFactory,
     ISearchWorkQueue queue,
@@ -59,33 +70,71 @@ public class SearchExecutionWorker(
 
         var matchedProviders = _providers.Where(p => p.CanHandle(session.Target)).ToList();
         if (!matchedProviders.Any())
+        {
             _logger.LogWarning("Providers for this target not found :(. Session id: {SearchSessionId}",
                 searchSessionId);
-
-        foreach (var provider in matchedProviders)
-        {
-            _logger.LogInformation("Provider launch: {Key}", provider.Key);
-
-            await foreach (var finding in provider.ReadAllAsync(session.Target, cancellationToken))
-            {
-                _logger.LogInformation("[{Key}] found ({Type}): {Data}", provider.Key, finding.Type, finding.DataJson);
-
-                var findingModel = SearchFinding.Create(
-                    searchSessionId,
-                    provider.Key,
-                    finding.Type,
-                    finding.DataJson);
-                if (findingModel.IsFailure)
-                {
-                    _logger.LogWarning("Failed to create search finding: {Error}", findingModel.Error);
-                    return;
-                }
-                
-                session.AddFinding(findingModel.Value);
-                
-                await repository.AddFindingAsync(findingModel.Value, cancellationToken);
-            }
+            session.Finish();
+            await repository.UpdateAsync(session, cancellationToken);
+            return;
         }
+
+        // Create unbounded channel 
+        var channel = Channel.CreateUnbounded<(string providerKey, RawSearchFinding finding)>(
+            new UnboundedChannelOptions
+            {
+                SingleWriter = false, // Any providers
+                SingleReader = true // Single reader: Database, etc
+            });
+
+        // We launch all providers COMPETITIVELY in the background
+        var producersTask = Task.Run(async () =>
+        {
+            var tasks = matchedProviders.Select(async provider =>
+            {
+                try
+                {
+                    _logger.LogInformation("Provider Launch: {Key}", provider.Key);
+
+                    await foreach (var finding in provider.ReadAllAsync(session.Target, cancellationToken))
+                    {
+                        await channel.Writer.WriteAsync((provider.Key, finding), cancellationToken);
+                    }
+
+                    _logger.LogInformation("Provider finished {Key}", provider.Key);
+                }
+
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Provider {Key} failed with exception", provider.Key);
+                }
+            });
+            
+            await Task.WhenAll(tasks);
+            
+            channel.Writer.Complete();
+        }, cancellationToken);
+        
+        // The only consumer: he proofreads the finds as they are received and saves them in the database
+        await foreach (var (providerKey, rawFinding) in channel.Reader.ReadAllAsync(cancellationToken))
+        {
+            _logger.LogInformation("[{Key}] found ({Type}): {Data}", providerKey, rawFinding.Type, rawFinding.DataJson);
+
+            var findingModel = SearchFinding.Create(
+                searchSessionId,
+                providerKey,
+                rawFinding.Type,
+                rawFinding.DataJson);
+            if (findingModel.IsFailure)
+            {
+                _logger.LogWarning("Failed to create search finding: {Error}", findingModel.Error);
+                continue; // we do not interrupt the session because of one broken element
+            }
+            
+            session.AddFinding(findingModel.Value);
+            await repository.AddFindingAsync(findingModel.Value, cancellationToken);
+        }
+
+        await producersTask;
         
         session.Finish();
         await repository.UpdateAsync(session, cancellationToken);
