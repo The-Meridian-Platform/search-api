@@ -1,4 +1,4 @@
-﻿using System.Threading.Channels;
+using System.Threading.Channels;
 using MeridianHost.Application.SearchSessions.Execute.Broadcasting.Contracts.Additional;
 using MeridianHost.Application.SearchSessions.Execute.Broadcasting.Repositories;
 using MeridianHost.Application.SearchSessions.Execute.Providers;
@@ -82,6 +82,13 @@ public class SearchExecutionWorker(
                 searchSessionId);
             session.Finish();
             await repository.UpdateAsync(session, cancellationToken);
+            await _broadcaster.PublishAsync(
+                new SessionFinishedEvent(
+                    searchSessionId,
+                    session.SearchStatus.ToString(),
+                    0,
+                    session.FinishedAt!.Value),
+                cancellationToken);
             return;
         }
 
