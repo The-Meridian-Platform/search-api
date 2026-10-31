@@ -1,5 +1,7 @@
-﻿using MeridianHost.Application.SearchSessions.Execute.Providers;
+﻿using MeridianHost.Application.SearchSessions.Execute.Broadcasting.Repositories;
+using MeridianHost.Application.SearchSessions.Execute.Providers;
 using MeridianHost.Application.SearchSessions.Execute.Queue;
+using MeridianHost.Infrastructure.SearchSessions.Broadcasting;
 using MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Dns;
 using MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Whois;
 using MeridianHost.Infrastructure.SearchSessions.Queue;
@@ -13,6 +15,7 @@ public static class Injection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton<ISearchWorkQueue, SearchWorkQueue>();
+        services.AddSingleton<ISearchSessionBroadcaster, SearchSessionBroadcaster>();
 
         services.AddHttpClient<DnsSearchProvider>();
         services.AddHttpClient<WhoisSearchProvider>();
@@ -21,6 +24,8 @@ public static class Injection
         services.AddTransient<ISearchProvider>(sp => sp.GetRequiredService<WhoisSearchProvider>());
 
         services.AddHostedService<SearchExecutionWorker>();
+
+        services.AddGrpc();
         
         return services;
     }

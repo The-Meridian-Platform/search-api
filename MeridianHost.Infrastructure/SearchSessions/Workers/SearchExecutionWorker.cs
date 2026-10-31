@@ -1,4 +1,6 @@
 ﻿using System.Threading.Channels;
+using MeridianHost.Application.SearchSessions.Execute.Broadcasting.Contracts.Additional;
+using MeridianHost.Application.SearchSessions.Execute.Broadcasting.Repositories;
 using MeridianHost.Application.SearchSessions.Execute.Providers;
 using MeridianHost.Application.SearchSessions.Execute.Providers.Contracts;
 using MeridianHost.Application.SearchSessions.Execute.Queue;
@@ -23,11 +25,13 @@ public class SearchExecutionWorker(
     IServiceScopeFactory scopeFactory,
     ISearchWorkQueue queue,
     IEnumerable<ISearchProvider> providers,
+    ISearchSessionBroadcaster broadcaster,
     ILogger<SearchExecutionWorker> logger) : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
     private readonly ISearchWorkQueue _queue = queue;
     private readonly IEnumerable<ISearchProvider> _providers = providers;
+    private readonly ISearchSessionBroadcaster _broadcaster = broadcaster;
     private readonly ILogger<SearchExecutionWorker> _logger = logger;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -63,6 +67,9 @@ public class SearchExecutionWorker(
         var session = sessionResult.Value;
 
         session.Start();
+
+        await _broadcaster.PublishAsync(
+            new SessionStartedEvent(searchSessionId, session.Target.Value, session.StartedAt!.Value), cancellationToken);
 
         await repository.UpdateAsync(session, cancellationToken);
         _logger.LogInformation("Finding for search session {SearchSessionId} has started. Target: {Target}",
@@ -134,6 +141,16 @@ public class SearchExecutionWorker(
             
             session.AddFinding(findingModel.Value);
             findings.Add(findingModel.Value);
+
+            await _broadcaster.PublishAsync(
+                new FindingDiscoveredEvent(
+                    searchSessionId,
+                    findingModel.Value.Id,
+                    providerKey,
+                    rawFinding.Type,
+                    rawFinding.DataJson,
+                    findingModel.Value.CreatedAt),
+                cancellationToken);
         }
 
         await producersTask;
@@ -143,6 +160,14 @@ public class SearchExecutionWorker(
         
         session.Finish();
         await repository.UpdateAsync(session, cancellationToken);
+
+        await _broadcaster.PublishAsync(
+            new SessionFinishedEvent(
+                searchSessionId,
+                session.SearchStatus.ToString(),
+                findings.Count,
+                session.FinishedAt!.Value),
+            cancellationToken);
         
         _logger.LogInformation("Session {SessionId} successfully finished", searchSessionId);
     }
