@@ -7,7 +7,7 @@ namespace MeridianHost.Application.SearchSessions.Read.Contracts;
 public sealed record SearchSessionResponse(
     Guid Id,
     SearchTargetResponse Target,
-    List<SearchFindingResponse>? Finding,
+    List<SearchFindingResponse> Finding,
     Status Status,
     DateTimeOffset CreatedAt,
     DateTimeOffset? StartedAt,

@@ -11,7 +11,7 @@ public class GetAllSearchSessionsHandler(ISearchSessionRepository repository)
 
     public async Task<Result<List<SearchSessionResponse>>> HandleAsync(bool? includeFindings, CancellationToken cancellationToken)
     {
-        var result = await _repository.GetAllAsync(includeFindings.HasValue, cancellationToken);
+        var result = await _repository.GetAllAsync(includeFindings ?? false, cancellationToken);
 
         return result.IsSuccess
             ? result.Value.Select(x => x.ToResponse()).ToList()
