@@ -12,5 +12,5 @@ public interface ISearchProvider
     
     bool CanHandle(SearchTarget target); // can he do it??????
     
-    IAsyncEnumerable<SearchFinding> ReadAllAsync(SearchTarget target, CancellationToken cancellationToken); // writes that it sees
+    IAsyncEnumerable<RawSearchFinding> ReadAllAsync(SearchTarget target, CancellationToken cancellationToken); // writes that it sees
 }

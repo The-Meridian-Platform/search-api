@@ -5,6 +5,6 @@
 /// </summary>
 /// <param name="Type"></param>
 /// <param name="DataJson"></param>
-public sealed record SearchFinding(
+public sealed record RawSearchFinding(
     string Type, // something kinda "avatar", "profile", etc
     string DataJson); // raw json

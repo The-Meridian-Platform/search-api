@@ -5,9 +5,9 @@ using MeridianHost.Application.SearchSessions.Execute.Providers;
 using MeridianHost.Application.SearchSessions.Execute.Providers.Contracts;
 using MeridianHost.Domain.SearchTargets;
 using MeridianHost.Domain.SearchTargets.Enum;
-using MeridianHost.Infrastructure.SearchSessions.Providers.Contracts;
+using MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Contracts.Dns;
 
-namespace MeridianHost.Infrastructure.SearchSessions.Providers.Realisations;
+namespace MeridianHost.Infrastructure.SearchSessions.Providers.Domain.Realisations;
 
 public class DomainSearchProvider(HttpClient client) : ISearchProvider
 {
@@ -18,7 +18,7 @@ public class DomainSearchProvider(HttpClient client) : ISearchProvider
     public bool CanHandle(SearchTarget target)
         => target.TargetType == SearchTargetType.Domain;
 
-    public async IAsyncEnumerable<SearchFinding> ReadAllAsync(
+    public async IAsyncEnumerable<RawSearchFinding> ReadAllAsync(
         SearchTarget target, 
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
     {
@@ -39,7 +39,7 @@ public class DomainSearchProvider(HttpClient client) : ISearchProvider
         }
     }
 
-    private async Task<List<SearchFinding>> FetchRecordsAsync(
+    private async Task<List<RawSearchFinding>> FetchRecordsAsync(
         string domain, 
         string recordType, 
         CancellationToken cancellationToken)
@@ -61,7 +61,7 @@ public class DomainSearchProvider(HttpClient client) : ISearchProvider
                 return [];
 
             return result.Answers
-                .Select(answer => new SearchFinding("dns_record", JsonSerializer.Serialize(answer)))
+                .Select(answer => new RawSearchFinding("dns_record", JsonSerializer.Serialize(answer)))
                 .ToList();
         }
         catch
