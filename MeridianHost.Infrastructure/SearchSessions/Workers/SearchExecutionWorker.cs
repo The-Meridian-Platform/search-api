@@ -20,6 +20,7 @@ namespace MeridianHost.Infrastructure.SearchSessions.Workers;
 /// <param name="scopeFactory"></param>
 /// <param name="queue"></param>
 /// <param name="providers"></param>
+/// <param name="broadcaster"></param>
 /// <param name="logger"></param>
 public class SearchExecutionWorker(
     IServiceScopeFactory scopeFactory,
