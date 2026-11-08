@@ -1,9 +1,10 @@
-﻿namespace MeridianHost.Domain.SearchTargets.Enum;
+namespace MeridianHost.Domain.SearchTargets.Enum;
 
 public enum SearchTargetType
 {
     Email,
     Username,
     IpAddress,
-    Domain
+    Domain,
+    PhoneNumber
 }

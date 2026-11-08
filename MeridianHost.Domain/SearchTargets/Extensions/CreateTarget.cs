@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using CSharpFunctionalExtensions;
 using MeridianHost.Domain.SearchTargets.Enum;
 using MeridianHost.Domain.SearchTargets.ValueObjects;
@@ -48,5 +48,16 @@ public static class CreateTarget
             : Result.Success(SearchTarget.CreateValidated(
                 username.Value.Value,
                 SearchTargetType.Username));
+    }
+
+    public static Result<SearchTarget> CreatePhoneNumber(string value)
+    {
+        var phone = PhoneNumber.Create(value);
+
+        return phone.IsFailure
+            ? Result.Failure<SearchTarget>(phone.Error)
+            : Result.Success(SearchTarget.CreateValidated(
+                phone.Value.Value,
+                SearchTargetType.PhoneNumber));
     }
 }
