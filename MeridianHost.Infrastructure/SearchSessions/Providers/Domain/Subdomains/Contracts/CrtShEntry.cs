@@ -20,6 +20,18 @@ public sealed class CrtShEntry
     public string? NotAfter { get; set; }
 }
 
+public sealed class CertSpotterEntry
+{
+    [JsonPropertyName("dns_names")]
+    public List<string>? DnsNames { get; set; }
+
+    [JsonPropertyName("not_before")]
+    public string? NotBefore { get; set; }
+
+    [JsonPropertyName("not_after")]
+    public string? NotAfter { get; set; }
+}
+
 public sealed class SubdomainFinding
 {
     public string Subdomain { get; set; } = string.Empty;
