@@ -52,7 +52,7 @@ public class BlockchainNetworkDetectorProvider : ISearchProvider
                     "Polygon (PoS)",
                     "Avalanche (C-Chain)"
                 ],
-                Description = "Адрес совместим со всеми EVM-сетями. Может иметь баланс и историю транзакций сразу в нескольких блокчейнах L1/L2."
+                Description = "Address is compatible with all EVM-based networks. May hold balances and transaction history across multiple L1 and L2 chains simultaneously."
             },
             "Bitcoin" => new BlockchainNetworkFinding
             {
@@ -61,7 +61,7 @@ public class BlockchainNetworkDetectorProvider : ISearchProvider
                 AddressFormat = DetectBtcFormat(address),
                 ExplorerUrl = $"https://blockstream.info/address/{address}",
                 SupportedChains = ["Bitcoin Mainnet", "Bitcoin Lightning (On-chain channel funding)"],
-                Description = "Нативный адрес сети Bitcoin. Отслеживается через UTXO модель транзакций."
+                Description = "Native Bitcoin network address. Tracked using the UTXO transaction model."
             },
             "Tron" => new BlockchainNetworkFinding
             {
@@ -70,7 +70,7 @@ public class BlockchainNetworkDetectorProvider : ISearchProvider
                 AddressFormat = "Base58Check (21-byte with 0x41 prefix)",
                 ExplorerUrl = $"https://tronscan.org/#/address/{address}",
                 SupportedChains = ["Tron Mainnet (TRC-20 / USDT hub)"],
-                Description = "Адрес в сети Tron. Основной шлюз для транзакций стейблкоинов USDT стандарта TRC-20."
+                Description = "Address on the Tron network. Primary hub for USDT transactions under the TRC-20 token standard."
             },
             "Solana" => new BlockchainNetworkFinding
             {
@@ -79,7 +79,7 @@ public class BlockchainNetworkDetectorProvider : ISearchProvider
                 AddressFormat = "Base58 (32-byte Ed25519 public key)",
                 ExplorerUrl = $"https://solscan.io/account/{address}",
                 SupportedChains = ["Solana Mainnet-Beta"],
-                Description = "Адрес учетной записи в высокопроизводительной сети Solana (SPL токены)."
+                Description = "Account address on the high-throughput Solana network (SPL tokens and programs)."
             },
             _ => new BlockchainNetworkFinding
             {
@@ -88,7 +88,7 @@ public class BlockchainNetworkDetectorProvider : ISearchProvider
                 AddressFormat = "Unknown Format",
                 ExplorerUrl = string.Empty,
                 SupportedChains = [network],
-                Description = "Идентифицирована блокчейн-сеть."
+                Description = "Identified blockchain network."
             }
         };
     }
