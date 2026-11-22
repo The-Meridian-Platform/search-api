@@ -32,6 +32,7 @@ public sealed class SearchTarget
             SearchTargetType.Username => CreateUsername(value),
             SearchTargetType.Email => CreateEmail(value),
             SearchTargetType.PhoneNumber => CreatePhoneNumber(value),
+            SearchTargetType.BlockchainAddress => CreateBlockchainAddress(value),
             null => DetectType(value),
             _ => Result.Failure<SearchTarget>("invalid target type")
         };
@@ -42,6 +43,7 @@ public sealed class SearchTarget
         {
             _ when IPAddress.TryParse(value, out _) => CreateIpAddress(value),
             _ when Email.TryParse(value, out _) => CreateEmail(value),
+            _ when BlockchainAddress.TryParse(value, out _) => CreateBlockchainAddress(value),
             _ when PhoneNumber.Create(value).IsSuccess && (value.Trim().StartsWith('+') || (value.Trim().All(char.IsDigit) && value.Trim().Length >= 10)) => CreatePhoneNumber(value),
             _ when DomainName.TryParse(value, out _) => CreateDomainName(value),
             _ when Username.TryParse(value, out _) => CreateUsername(value),

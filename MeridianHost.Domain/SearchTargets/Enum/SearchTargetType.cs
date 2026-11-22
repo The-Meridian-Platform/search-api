@@ -6,5 +6,6 @@ public enum SearchTargetType
     Username,
     IpAddress,
     Domain,
-    PhoneNumber
+    PhoneNumber,
+    BlockchainAddress
 }

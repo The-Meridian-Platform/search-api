@@ -18,4 +18,8 @@
       <ProjectReference Include="..\MeridianHost.Application\MeridianHost.Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="SearchSessions\Providers\Blockchain\" />
+    </ItemGroup>
+
 </Project>

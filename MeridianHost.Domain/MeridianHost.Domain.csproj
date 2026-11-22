@@ -10,8 +10,4 @@
       <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="SearchSessions\ValueObjects\" />
-    </ItemGroup>
-
 </Project>

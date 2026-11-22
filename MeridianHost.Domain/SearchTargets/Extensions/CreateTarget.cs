@@ -60,4 +60,15 @@ public static class CreateTarget
                 phone.Value.Value,
                 SearchTargetType.PhoneNumber));
     }
+
+    public static Result<SearchTarget> CreateBlockchainAddress(string value)
+    {
+        var address = BlockchainAddress.Create(value);
+
+        return address.IsFailure
+            ? Result.Failure<SearchTarget>(address.Error)
+            : Result.Success(SearchTarget.CreateValidated(
+                address.Value.Value,
+                SearchTargetType.BlockchainAddress));
+    }
 }
