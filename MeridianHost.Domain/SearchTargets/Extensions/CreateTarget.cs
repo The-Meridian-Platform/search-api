@@ -2,6 +2,7 @@ using System.Net;
 using CSharpFunctionalExtensions;
 using MeridianHost.Domain.SearchTargets.Enum;
 using MeridianHost.Domain.SearchTargets.ValueObjects;
+using MeridianHost.Domain.SearchTargets.ValueObjects.Domain;
 
 namespace MeridianHost.Domain.SearchTargets.Extensions;
 

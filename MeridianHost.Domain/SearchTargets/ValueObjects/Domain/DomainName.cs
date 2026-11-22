@@ -1,8 +1,8 @@
 using System.Globalization;
 using CSharpFunctionalExtensions;
-using MeridianHost.Domain.SearchTargets.ValueObjects.Additional;
+using MeridianHost.Domain.SearchTargets.ValueObjects.Domain.Additional;
 
-namespace MeridianHost.Domain.SearchTargets.ValueObjects;
+namespace MeridianHost.Domain.SearchTargets.ValueObjects.Domain;
 
 public readonly struct DomainName : IEquatable<DomainName>
 {

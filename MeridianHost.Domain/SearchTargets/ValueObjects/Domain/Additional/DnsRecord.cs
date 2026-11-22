@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
-using MeridianHost.Domain.SearchTargets.Enum;
+using MeridianHost.Domain.SearchTargets.ValueObjects.Domain.Enum;
 
-namespace MeridianHost.Domain.SearchTargets.ValueObjects.Additional;
+namespace MeridianHost.Domain.SearchTargets.ValueObjects.Domain.Additional;
 
 public readonly record struct DnsRecord
 {
